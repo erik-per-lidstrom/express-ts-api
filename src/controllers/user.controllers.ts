@@ -1,20 +1,9 @@
 import { type Request, type Response } from "express";
+import { createdUser, getAllUsers } from "../services/user.services";
 
-const users = [
-  {
-    id: 1,
-    name: "erik",
-    job: "backend dev",
-  },
-  {
-    id: 2,
-    name: "jondo",
-    job: "none",
-  },
-];
-
-export const getUser = (req: Request, res: Response) => {
-  res.status(200).json(users);
+export const getUser = async (req: Request, res: Response) => {
+  const AllUsers = await getAllUsers();
+  res.status(200).json(AllUsers);
 };
 
 export const getUserById = (req: Request, res: Response) => {
@@ -23,8 +12,14 @@ export const getUserById = (req: Request, res: Response) => {
   res.json({ id: userId });
 };
 
-export const createUser = (req: Request, res: Response) => {
-  const { id, name, job } = req.body;
-
-  res.status(201).json({ message: "user created", data: { id, name, job } });
+export const createUser = async (req: Request, res: Response) => {
+  try {
+    const { name, job, email } = req.body;
+    const newUser = await createdUser(name, job, email);
+    res.status(201).json({ status: "user created sucsesfuly", user: newUser });
+  } catch (error) {
+    res
+      .status(403)
+      .json({ message: "error creating user email alrady used", error });
+  }
 };

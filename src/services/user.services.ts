@@ -1,52 +1,34 @@
-interface User {
-  id: number;
-  name: string;
-  job: string;
-  email: string;
-}
+import { UserModel, User } from "../models/user.model";
 
-const users: User[] = [
-  {
-    id: 1,
-    name: "erik",
-    job: "backend dev",
-    email: "erik@example.com",
-  },
-  {
-    id: 2,
-    name: "jondo",
-    job: "none",
-    email: "jondo@example.com",
-  },
-];
-
-export const getAllUsers = async (): Promise<User[]> => {
-  return new Promise((resolve) => {
-    resolve(users);
-  });
+export const createUser = async (data: User): Promise<User> => {
+  return await UserModel.create(data);
 };
 
-export const createdUser = async (
-  name: string,
-  job: string,
-  email: string
-): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    const existingUser = users.find((user) => user.email === email);
+export const findAll = async () => {
+  return await UserModel.find({});
+};
 
-    if (existingUser) {
-      reject(new Error("email alrady exsists in this system"));
-      return;
-    }
+export const findById = async (id: string) => {
+  return await UserModel.findById(id);
+};
 
-    const newUser: User = {
-      id: users.length + 1,
-      name,
-      job,
-      email,
-    };
-
-    users.push(newUser);
-    resolve(newUser);
+export type UserDocument = typeof UserModel.prototype;
+export const updateUserService = async (
+  id: string,
+  updateData: Partial<UserDocument>
+) => {
+  const existingUser = await UserModel.findById(id);
+  if (!existingUser) throw new Error("User not found...");
+  const updatedUser = await UserModel.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
   });
+  if (!updatedUser) throw new Error("User not found...");
+  return updatedUser;
+};
+
+export const deleteUserService = async (id: string) => {
+  const deletedUser = await UserModel.findByIdAndDelete(id);
+  if (!deletedUser) throw new Error("User not found...");
+  return deletedUser;
 };

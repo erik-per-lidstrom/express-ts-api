@@ -9,10 +9,13 @@ export const findAll = async () => {
 };
 
 export const findById = async (id: string) => {
-  return await UserModel.findById(id);
+  const user = await UserModel.findById(id);
+  console.log(user);
+  return user;
 };
 
 export type UserDocument = typeof UserModel.prototype;
+
 export const updateUserService = async (
   id: string,
   updateData: Partial<UserDocument>

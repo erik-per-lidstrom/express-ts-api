@@ -17,8 +17,12 @@ export const create = async (req: Request, res: Response) => {
 };
 
 export const getUser = async (req: Request, res: Response) => {
-  const users = await findAll();
-  res.json(users);
+  try {
+    const users = await findAll();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).send({ message: (error as Error).message });
+  }
 };
 
 export const getUserById = async (req: Request, res: Response) => {
@@ -32,6 +36,7 @@ export const getUserById = async (req: Request, res: Response) => {
     res.status(500).send({ message: (error as Error).message });
   }
 };
+
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const updatedUser = await updateUserService(

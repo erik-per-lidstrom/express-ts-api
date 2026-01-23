@@ -1,24 +1,30 @@
-import { UserModel, User } from "../models/user.model";
+import { UserModel, type User } from "../models/user.model";
+import { AppError } from "../utils/app.error";
 
 export const createUser = async (data: User): Promise<User> => {
-  return await UserModel.create(data);
+  return await UserModel.create(data); //! this neds to be changed
 };
 
 export const findAll = async () => {
-  return await UserModel.find({});
+  const allUsers = await UserModel.find({});
+  if (allUsers.length === 0) {
+    throw new AppError("users not found", 404);
+  }
+  return;
 };
 
 export const findById = async (id: string) => {
   const user = await UserModel.findById(id);
-  console.log(user);
+  if (!user) {
+    throw new AppError("user not found", 404);
+  }
+
   return user;
 };
 
-export type UserDocument = typeof UserModel.prototype;
-
 export const updateUserService = async (
   id: string,
-  updateData: Partial<UserDocument>
+  updateData: Partial<User>
 ) => {
   const existingUser = await UserModel.findById(id);
   if (!existingUser) throw new Error("User not found...");
@@ -26,6 +32,7 @@ export const updateUserService = async (
     new: true,
     runValidators: true,
   });
+
   if (!updatedUser) throw new Error("User not found...");
   return updatedUser;
 };

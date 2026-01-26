@@ -9,7 +9,7 @@ export interface Product {
 export const ProductZodSchema = z.object({
   body: z.object({
     name: z.string("not valid").min(3),
-    prise: z.number("not valid").minValue(1),
+    prise: z.number("not valid").min(1),
     description: z.string("not valid").min(0),
   }),
 });

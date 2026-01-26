@@ -8,10 +8,11 @@ import {
 } from "../controllers/user.controllers";
 import { validate } from "../middleware/validate.middleware";
 import { userZodSchema } from "../models/user.model";
+import { protect } from "../middleware/auth.middelvware";
 
 const router = Router();
 
-router.get("/", getUser);
+router.get("/", protect, getUser);
 
 router.get("/:id", getUserById);
 

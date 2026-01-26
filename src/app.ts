@@ -1,6 +1,7 @@
 import express, { type Request, type Response } from "express";
 import userRoutes from "./routes/user.routes";
 import productRoutes from "./routes/products.routes";
+import authRoutes from "./routes/auth.routes";
 import { errorHandler } from "./middleware/error.middelware";
 
 export const createApp = () => {
@@ -9,6 +10,7 @@ export const createApp = () => {
 
   app.use("/api/users", userRoutes);
   app.use("/api/products", productRoutes);
+  app.use("/api/auth", authRoutes);
 
   // error handling middleware
   app.use(errorHandler);

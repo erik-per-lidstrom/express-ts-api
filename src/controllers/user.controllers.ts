@@ -14,7 +14,8 @@ export const create = async (
   next: NextFunction
 ) => {
   try {
-    const user = await createUser(req.body);
+    const { age, email, name } = req.body;
+    const user = await createUser(age, email, name);
     res.status(201).json(user);
   } catch (error) {
     next(error);

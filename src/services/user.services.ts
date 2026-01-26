@@ -1,8 +1,12 @@
 import { UserModel, type User } from "../models/user.model";
 import { AppError } from "../utils/app.error";
 
-export const createUser = async (data: User): Promise<User> => {
-  return await UserModel.create(data); //! this neds to be changed
+export const createUser = async (age: number, email: string, name: string) => {
+  const existingUser = await UserModel.findOne({ email });
+  console.log(existingUser);
+  if (existingUser) throw new AppError("user alrady exists", 409);
+  const newUser = { age, email, name };
+  return newUser;
 };
 
 export const findAll = async () => {
@@ -10,7 +14,7 @@ export const findAll = async () => {
   if (allUsers.length === 0) {
     throw new AppError("users not found", 404);
   }
-  return;
+  return allUsers;
 };
 
 export const findById = async (id: string) => {

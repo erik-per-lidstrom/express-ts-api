@@ -1,11 +1,14 @@
 import mongoose from "mongoose";
-import { string, z } from "zod";
+import { z } from "zod";
+
+export type UserRole = "user" | "modirator" | "admin";
 
 export interface User {
   name: string;
   email: string;
   age: number;
   password: string | undefined;
+  role: UserRole;
 }
 
 export const userZodSchema = z.object({
@@ -40,7 +43,12 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     age: { type: Number, required: true },
-    password: { type: string, require: true, select: false },
+    password: { type: String, require: true, select: false },
+    role: {
+      type: String,
+      enum: ["user", "modirator", "admin"],
+      default: "user",
+    },
   },
   { timestamps: true }
 );

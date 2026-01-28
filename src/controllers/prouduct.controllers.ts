@@ -1,5 +1,4 @@
 import { NextFunction, type Request, type Response } from "express";
-import { CreateUserTypeZ } from "../models/user.model";
 import {
   createProduct,
   deleteProductService,

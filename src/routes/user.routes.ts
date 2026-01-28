@@ -8,18 +8,18 @@ import {
 } from "../controllers/user.controllers";
 import { validate } from "../middleware/validate.middleware";
 import { userZodSchema } from "../models/user.model";
-import { protect } from "../middleware/auth.middelvware";
+import { protect, restrictTo } from "../middleware/auth.middelvware";
 
 const router = Router();
 
 router.get("/", protect, getUser);
 
-router.get("/:id", getUserById);
+router.get("/:id", protect, getUserById);
 
 router.post("/", validate(userZodSchema), create);
 
-router.patch("/:id", updateUser);
+router.patch("/:id", protect, restrictTo("admin", "modirator"), updateUser);
 
-router.delete("/:id", deleteUser);
+router.delete("/:id", protect, restrictTo("admin"), deleteUser);
 
 export default router;

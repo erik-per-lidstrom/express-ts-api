@@ -26,25 +26,14 @@ export const protect = async (
   }
 };
 
-export const restrictTo = (...allowedRoles: string[]) => {
+type Roles = "user" | "modirator" | "admin";
+
+export const restrictTo = (...allowedRoles: Roles[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      throw new AppError("unauthorised", 401);
-    }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-
-    const paload = decoded as JwtPayload;
-    req.user = { id: paload.id, role: paload.role };
     const user = req.user;
-    console.log(req.body);
 
-    if (!user) {
-      throw new AppError("unauthorised user", 401);
-    }
-
-    if (!user || !allowedRoles.includes(user.role)) {
-      throw new AppError("Access denied", 403);
+    if (!user || !allowedRoles.includes(user.role as Roles)) {
+      throw new AppError("forbiden", 403);
     }
 
     next();

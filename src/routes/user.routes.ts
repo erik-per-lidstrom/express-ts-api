@@ -12,13 +12,13 @@ import { protect, restrictTo } from "../middleware/auth.middelvware";
 
 const router = Router();
 
-router.get("/", protect, getUser);
+router.get("/", protect, restrictTo("admin"), getUser);
 
 router.get("/:id", protect, getUserById);
 
 router.post("/", validate(userZodSchema), create);
 
-router.patch("/:id", protect, restrictTo("admin", "modirator"), updateUser);
+router.patch("/:id", protect, restrictTo("admin"), updateUser);
 
 router.delete("/:id", protect, restrictTo("admin"), deleteUser);
 

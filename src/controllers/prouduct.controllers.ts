@@ -14,8 +14,14 @@ export const create = async (
   next: NextFunction
 ) => {
   try {
-    const { name, prise, description } = req.body;
-    const product = await createProduct(name, prise, description);
+    const { name, price, description, stock, category } = req.body;
+    const product = await createProduct(
+      name,
+      price,
+      description,
+      stock,
+      category
+    );
     res.status(201).json(product);
   } catch (error) {
     next(error);

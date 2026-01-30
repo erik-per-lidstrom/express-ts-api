@@ -10,14 +10,14 @@ import { protect, restrictTo } from "../middleware/auth.middelvware";
 
 const router = Router();
 
-router.get("/", getProduct);
+router.get("/", protect, restrictTo("admin"), getProduct);
 
-router.get("/:id", getProductById);
+router.get("/:id", protect, restrictTo("admin"), getProductById);
 
-router.post("/", restrictTo("admin", "modirator"), protect, create);
+router.post("/", protect, restrictTo("admin"), create);
 
-router.put("/:id", restrictTo("admin", "modirator"), protect, updateProduct);
+router.put("/:id", protect, restrictTo("admin"), updateProduct);
 
-router.delete("/:id", restrictTo("admin"), protect, deleteProduct);
+router.delete("/:id", protect, restrictTo("admin"), deleteProduct);
 
 export default router;

@@ -1,16 +1,19 @@
-import { ProductModel } from "../models/product.model";
-import { UserModel, type User } from "../models/user.model";
+import { ProductModel, type Product } from "../models/product.model";
+
 import { AppError } from "../utils/app.error";
 
 export const createProduct = async (
   name: string,
-  prise: number,
-  description: string
+  price: number,
+  description: string,
+  stock: number,
+  category: string
 ) => {
   const existingProduct = await ProductModel.findOne({ name });
   console.log(existingProduct);
   if (existingProduct) throw new AppError("user alrady exists", 409);
-  const newProduct = { name, prise, description };
+  const newProduct = { name, price, description, stock, category };
+  await ProductModel.create(newProduct);
   return newProduct;
 };
 
@@ -33,7 +36,7 @@ export const findById = async (id: string) => {
 
 export const updateProductService = async (
   id: string,
-  ProductData: Partial<User>
+  ProductData: Partial<Product>
 ) => {
   const existingProduct = await ProductModel.findById(id);
   if (!existingProduct) throw new Error("User not found...");

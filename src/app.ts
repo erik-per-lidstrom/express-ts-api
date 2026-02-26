@@ -1,8 +1,12 @@
 import express, { type Request, type Response } from "express";
+import userRouter from "./routes/user.route";
 
 export const createApp = () => {
   const app = express(); // Global middleware (runs on every request)
   app.use(express.json());
+
+  app.use("/api/users", userRouter);
+
   // Health check (quick way to verify server is alive)
   app.get("/health", (req: Request, res: Response) => {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });

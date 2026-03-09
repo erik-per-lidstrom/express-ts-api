@@ -1,48 +1,113 @@
-import { pool } from "../config/db";
+import bcrypt from "bcrypt";
+import { prisma } from "../config/db";
+import { CreateUserTypeZ, UpdateUserTypeZ } from "../models/user.model";
 import { AppError } from "../utils/app.error";
 
-export const createUserService = async (name: string, email: string) => {
-  const query = ` INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *; `;
+export const getAllUsersService = async () => {
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      firstname: true,
+      lastname: true,
+      email: true,
+    },
+  });
 
-  const result = await pool.query(query, [name, email]);
-  return result.rows[0];
+  return users;
 };
 
-export const getUsersService = async () => {
-  const result = await pool.query("SELECT * FROM users");
+export const createUserService = async (data: CreateUserTypeZ) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { email: data.email },
+  });
 
-  if (!result) {
-    throw new AppError("Users not found", 404);
+  if (existingUser) {
+    throw new AppError("An user with that email already exists", 409);
   }
-  return result.rows;
+
+  // encrypt password
+  const hashedPassword = await bcrypt.hash(data.password, 12);
+
+  return prisma.user.create({
+    data: {
+      firstname: data.firstname,
+      lastname: data.lastname,
+      password: hashedPassword,
+      email: data.email,
+    },
+  });
 };
 
-export const getUserByIdService = async (id: number) => {
-  const query = `SELECT * FROM users WHERE id = $1`;
+export const getUserByIdSevervice = async (id: number) => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      firstname: true,
+      lastname: true,
+      email: true,
+      created_at: true,
+    },
+  });
 
-  const result = await pool.query(query, [id]);
-  if (!result) {
+  if (!user) {
     throw new AppError("User not found", 404);
   }
-  return result.rows[0] || null;
-};
 
-export const updateUserService = async (name: string, id: number) => {
-  const query = ` UPDATE users SET name = $1 WHERE id = $2 RETURNING *; `;
-
-  const result = await pool.query(query, [name, id]);
-
-  if (result.rowCount === 0) {
-    return null;
-  }
-  return result.rows[0];
+  return user;
 };
 
 export const deleteUserService = async (id: number) => {
-  const query = "DELETE FROM users WHERE id = $1";
-  const res = await pool.query(query, [id]);
-  if (res.rowCount === 0) {
-    throw new Error("User not found");
+  const userTobeDeleted = await prisma.user.findUnique({
+    where: { id },
+  });
+
+  if (!userTobeDeleted) {
+    throw new AppError("User not found", 404);
   }
-  return true;
+
+  return await prisma.user.delete({
+    where: { id },
+    select: {
+      id: true,
+      firstname: true,
+      lastname: true,
+      email: true,
+    },
+  });
+};
+
+export const updateUserService = async (id: number, data: UpdateUserTypeZ) => {
+  const userTobeUpdated = await prisma.user.findUnique({
+    where: { id },
+  });
+
+  if (!userTobeUpdated) {
+    throw new AppError("User not found", 404);
+  }
+
+  // encrypt password
+  if (data.password) {
+    data.password = await bcrypt.hash(data.password, 12);
+  } else {
+    data.password = userTobeUpdated.password;
+  }
+
+  const hashedPassword = await bcrypt.hash(data.password, 12);
+
+  return await prisma.user.update({
+    where: { id },
+    data: {
+      firstname: data.firstname,
+      lastname: data.lastname,
+      password: hashedPassword || userTobeUpdated.password,
+      email: data.email,
+    },
+    select: {
+      id: true,
+      firstname: true,
+      lastname: true,
+      email: true,
+    },
+  });
 };

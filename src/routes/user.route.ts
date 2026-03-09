@@ -1,23 +1,23 @@
 import { Router } from "express";
 import { protect } from "../middleware/auth.middleware";
 import {
-  createUser,
-  deleteUser,
-  getUserById,
-  getUsers,
-  updateUser,
+  createUserController,
+  deleteUserContoller,
+  getUserByIdController,
+  getUsersController,
+  updateUserController,
 } from "../controllers/user.controller";
 
 const router = Router();
 
-router.post("/", createUser);
+router.post("/", createUserController);
 
-router.get("/", getUsers);
+router.get("/", getUsersController);
 
-router.get("/:id", getUserById);
+router.get("/:id", getUserByIdController);
 
-router.put("/:id", updateUser);
+router.put("/:id", updateUserController);
 
-router.delete("/:id", deleteUser);
+router.delete("/:id", deleteUserContoller);
 
 export default router;

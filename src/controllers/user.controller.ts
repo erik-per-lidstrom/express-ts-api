@@ -1,76 +1,98 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
+import { CreateUserTypeZ } from "../model/user.model";
 import {
   createUserService,
   deleteUserService,
-  getUserByIdService,
-  getUsersService,
+  getAllUsersService,
+  getUserByIdSevervice,
   updateUserService,
 } from "../services/user.service";
 
-export const createUser = async (
+export const createUserController = async (
+  req: Request<{}, {}, CreateUserTypeZ>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const data = req.body;
+    const newUser = await createUserService(data);
+
+    if (!newUser) {
+      return res.status(500).json({ status: "Failed to create user" });
+    }
+
+    res.status(201).json({ status: "User Created sucesfully", user: newUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUsersController = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { name, email } = req.body;
   try {
-    const user = await createUserService(name, email);
+    const users = await getAllUsersService();
+
+    if (!users) {
+      return res.status(404).json({ status: "No users found" });
+    }
+
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserByIdController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+    const user = await getUserByIdSevervice(Number(id));
+
+    if (!user) {
+      return res.status(404).json({ status: "User not found" });
+    }
+
     res.status(200).json(user);
   } catch (error) {
     next(error);
   }
 };
 
-export const getUsers = async (
+export const deleteUserContoller = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const user = await getUsersService();
-    res.status(200).json(user);
+    const { id } = req.params;
+    const user = await deleteUserService(Number(id));
+
+    res.status(200).json({
+      status: `${user.firstname} ${user.lastname} deleted successfully`,
+      user,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const getUserById = async (
+export const updateUserController = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { id } = req.body;
   try {
-    const user = await getUserByIdService(id);
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
-  }
-};
+    const { id } = req.params;
+    const data = req.body;
 
-export const updateUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { name, id } = req.body;
-  try {
-    const user = await updateUserService(name, id);
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const deleteUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { id } = req.body;
-  try {
-    const user = await deleteUserService(id);
-    res.status(200).json(user);
+    const user = await updateUserService(Number(id), data);
+    res.status(200).json({ status: "User updated successfully", user });
   } catch (error) {
     next(error);
   }
